@@ -46,7 +46,11 @@ export function SettingsForm({ profile }: Props) {
         <label htmlFor="currency" className="text-sm font-medium">
           Currency for your prices
         </label>
+        {/* React resets the form after each submit, and a select does not
+            pick up a new defaultValue on reset. The key makes it remount
+            so it shows the saved currency. */}
         <select
+          key={values.currency}
           id="currency"
           name="currency"
           defaultValue={values.currency}
