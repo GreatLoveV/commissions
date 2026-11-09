@@ -44,3 +44,6 @@ next-env.d.ts
 !.env.example
 
 /src/generated/prisma
+
+# local image uploads (development only)
+/.uploads

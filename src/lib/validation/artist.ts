@@ -23,6 +23,7 @@ export const RESERVED_HANDLES = new Set([
   "static",
   "support",
   "terms",
+  "uploads",
   "www",
 ]);
 
