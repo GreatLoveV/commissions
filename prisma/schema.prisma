@@ -87,5 +87,196 @@ model Artist {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  portfolioImages PortfolioImage[]
+  commissionTypes CommissionType[]
+  requests        Request[]
+
   @@map("artists")
+}
+
+// ---------------------------------------------------------------
+// Tenant tables. Every table below has an artistId column.
+//
+// Requests and commission types have @@unique([id, artistId]) so
+// child tables can point at them with a two column foreign key.
+// That makes the database itself refuse a row whose artistId does
+// not match its parent, even if the app code has a bug.
+// ---------------------------------------------------------------
+
+model PortfolioImage {
+  id         String   @id @default(cuid())
+  artistId   String
+  artist     Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  // key of the file in image storage, not a full url
+  storageKey String
+  width      Int
+  height     Int
+  alt        String   @default("")
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([artistId, sortOrder])
+  @@map("portfolio_images")
+}
+
+model CommissionType {
+  id             String    @id @default(cuid())
+  artistId       String
+  artist         Artist    @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  name           String
+  description    String    @default("")
+  // money is stored in minor units (cents), never as a float
+  basePriceMinor Int
+  turnaroundDays Int
+  // hidden from the public page when false
+  isActive       Boolean   @default(true)
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  requests       Request[]
+
+  @@unique([id, artistId])
+  @@index([artistId, sortOrder])
+  @@map("commission_types")
+}
+
+enum RequestStatus {
+  REQUESTED
+  QUOTED
+  AWAITING_PAYMENT
+  IN_PROGRESS
+  SKETCH_REVIEW
+  DELIVERED
+  DECLINED
+  CANCELLED
+}
+
+enum UsageType {
+  PERSONAL
+  COMMERCIAL
+}
+
+model Request {
+  id               String         @id @default(cuid())
+  artistId         String
+  artist           Artist         @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  commissionTypeId String
+  // Restrict: a type that has requests cannot be deleted, only deactivated
+  commissionType   CommissionType @relation(fields: [commissionTypeId, artistId], references: [id, artistId], onDelete: Restrict)
+
+  // copied from the commission type when the request is made, because
+  // the artist can rename or reprice the type afterwards
+  typeNameSnapshot       String
+  basePriceMinorSnapshot Int
+  currency               String
+
+  clientName  String
+  clientEmail String
+  description String
+  usage       UsageType
+  deadline    DateTime? @db.Date
+
+  status           RequestStatus @default(REQUESTED)
+  quotedPriceMinor Int?
+  quoteSentAt      DateTime?
+  quoteApprovedAt  DateTime?
+
+  // sha256 of the token in the client's private link. The token itself
+  // is only ever in the email we send.
+  trackingTokenHash String @unique
+
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  files     RequestFile[]
+  events    RequestEvent[]
+  payments  Payment[]
+
+  @@unique([id, artistId])
+  @@index([artistId, status])
+  @@map("requests")
+}
+
+model RequestFile {
+  id           String   @id @default(cuid())
+  artistId     String
+  requestId    String
+  request      Request  @relation(fields: [requestId, artistId], references: [id, artistId], onDelete: Cascade)
+  storageKey   String
+  mimeType     String
+  sizeBytes    Int
+  originalName String
+  createdAt    DateTime @default(now())
+
+  @@index([artistId, requestId])
+  @@map("request_files")
+}
+
+enum EventType {
+  CREATED
+  STATUS_CHANGED
+  QUOTE_SENT
+  QUOTE_APPROVED
+  PAYMENT_RECORDED
+  NOTE
+}
+
+enum EventActor {
+  ARTIST
+  CLIENT
+  SYSTEM
+}
+
+// Append only history of a request. The client's status page is built from it.
+model RequestEvent {
+  id         String         @id @default(cuid())
+  artistId   String
+  requestId  String
+  request    Request        @relation(fields: [requestId, artistId], references: [id, artistId], onDelete: Cascade)
+  type       EventType
+  actor      EventActor
+  fromStatus RequestStatus?
+  toStatus   RequestStatus?
+  note       String?
+  createdAt  DateTime       @default(now())
+
+  @@index([artistId, requestId, createdAt])
+  @@map("request_events")
+}
+
+enum PaymentKind {
+  DEPOSIT
+  FINAL
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MANUAL
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  artistId    String
+  requestId   String
+  request     Request       @relation(fields: [requestId, artistId], references: [id, artistId], onDelete: Cascade)
+  kind        PaymentKind
+  amountMinor Int
+  currency    String
+  status      PaymentStatus @default(PENDING)
+  method      PaymentMethod @default(MANUAL)
+  // empty for manual payments. A payment provider would fill these in
+  // from its webhook later.
+  provider    String?
+  providerRef String?
+  paidAt      DateTime?
+  note        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([artistId, requestId])
+  @@map("payments")
 }
