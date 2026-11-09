@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Field, FormMessage, SubmitButton, TextArea } from "@/components/form";
+import { inputClass } from "@/components/styles";
 import { CURRENCIES } from "@/lib/validation/artist";
 import { updateProfile } from "../actions";
 
@@ -54,7 +55,7 @@ export function SettingsForm({ profile }: Props) {
           id="currency"
           name="currency"
           defaultValue={values.currency}
-          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900"
+          className={inputClass}
         >
           {CURRENCIES.map((code) => (
             <option key={code} value={code}>
@@ -63,7 +64,7 @@ export function SettingsForm({ profile }: Props) {
           ))}
         </select>
         {state.errors?.currency?.length ? (
-          <p className="text-sm text-red-700">
+          <p className="text-sm text-danger">
             {state.errors.currency.join(". ")}
           </p>
         ) : null}

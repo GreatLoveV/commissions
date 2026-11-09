@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonPrimary, linkClass } from "@/components/styles";
 
 export default function HomePage() {
   return (
@@ -6,18 +7,18 @@ export default function HomePage() {
       <h1 className="text-4xl font-semibold tracking-tight">
         Keep your art commissions out of your DMs
       </h1>
-      <p className="text-lg text-neutral-600">
+      <p className="text-lg text-muted">
         One public page for your commission types and prices, a request form
         for clients, and a board that shows where every commission stands.
       </p>
       <div className="flex flex-wrap gap-4">
         <Link
           href="/signup"
-          className="rounded-md bg-neutral-900 px-4 py-2 font-medium text-white hover:bg-neutral-700"
+          className={buttonPrimary}
         >
           Create an artist account
         </Link>
-        <Link href="/login" className="px-4 py-2 font-medium underline">
+        <Link href="/login" className={`px-4 py-2 font-medium ${linkClass}`}>
           Log in
         </Link>
       </div>

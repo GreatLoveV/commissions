@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
+import { buttonPrimary, inputClass } from "@/components/styles";
 
 type FieldProps = {
   label: string;
@@ -11,9 +12,6 @@ type FieldProps = {
   hint?: string;
   errors?: string[];
 };
-
-const inputClass =
-  "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 outline-none focus-visible:border-neutral-900 focus-visible:ring-2 focus-visible:ring-neutral-900/20 aria-invalid:border-red-600";
 
 // Builds the ids that link an input to its hint and error text,
 // so screen readers announce them with the field.
@@ -32,12 +30,12 @@ function FieldMessages({
   return (
     <>
       {hint && (
-        <p id={`${name}-hint`} className="text-sm text-neutral-600">
+        <p id={`${name}-hint`} className="text-sm text-muted">
           {hint}
         </p>
       )}
       {errors?.length ? (
-        <p id={`${name}-error`} className="text-sm text-red-700">
+        <p id={`${name}-error`} className="text-sm text-danger">
           {errors.join(". ")}
         </p>
       ) : null}
@@ -100,7 +98,7 @@ export function SubmitButton({ children }: { children: React.ReactNode }) {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-neutral-900 px-4 py-2 font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:opacity-60"
+      className={buttonPrimary}
     >
       {children}
     </button>
@@ -112,7 +110,7 @@ export function FormMessage({ ok, message }: { ok?: boolean; message?: string })
   return (
     <p
       role={ok ? "status" : "alert"}
-      className={ok ? "text-sm text-green-800" : "text-sm text-red-700"}
+      className={ok ? "text-sm text-open" : "text-sm text-danger"}
     >
       {message}
     </p>

@@ -13,7 +13,7 @@ export default async function LoginPage() {
     <>
       <h1 className="text-2xl font-semibold">Log in</h1>
       <LoginForm />
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-muted">
         New here?{" "}
         <Link href="/signup" className="underline">
           Create an account

@@ -7,7 +7,7 @@ export default function AuthLayout({
 }) {
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-12">
-      <Link href="/" className="text-sm text-neutral-600 hover:text-neutral-900">
+      <Link href="/" className="text-sm text-muted hover:text-ink">
         Back to home
       </Link>
       {children}

@@ -13,7 +13,7 @@ export default async function SignupPage() {
     <>
       <h1 className="text-2xl font-semibold">Create your artist account</h1>
       <SignupForm />
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-muted">
         Already have an account?{" "}
         <Link href="/login" className="underline">
           Log in
