@@ -1,0 +1,17 @@
+# Local Postgres for development and tests.
+# Start it with: docker compose up -d
+services:
+  db:
+    image: postgres:17
+    ports:
+      # bound to localhost only, on 5433 so it doesn't clash with a local install
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: commissions
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
