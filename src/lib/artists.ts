@@ -50,3 +50,7 @@ export async function updateArtist(
     throw error;
   }
 }
+
+export async function setSlotsOpen(artistId: string, slotsOpen: boolean) {
+  await prisma.artist.update({ where: { id: artistId }, data: { slotsOpen } });
+}

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { updateArtist } from "@/lib/artists";
+import { setSlotsOpen, updateArtist } from "@/lib/artists";
 import { text, type FormState } from "@/lib/form";
 import { requireArtist } from "@/lib/session";
 import { profileSchema } from "@/lib/validation/artist";
@@ -39,5 +39,15 @@ export async function updateProfile(
   }
 
   revalidatePath("/dashboard", "layout");
+  // the public page shows the profile, under the old and the new handle
+  revalidatePath(`/${artist.handle}`);
+  revalidatePath(`/${parsed.data.handle}`);
   return { ok: true, message: "Profile saved.", values: parsed.data };
+}
+
+export async function setSlots(open: boolean) {
+  const artist = await requireArtist();
+  await setSlotsOpen(artist.id, open);
+  revalidatePath("/dashboard");
+  revalidatePath(`/${artist.handle}`);
 }

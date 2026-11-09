@@ -2,6 +2,13 @@ import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { logout } from "./actions";
 
+const navLinks = [
+  { href: "/dashboard", label: "Requests" },
+  { href: "/dashboard/types", label: "Commission types" },
+  { href: "/dashboard/portfolio", label: "Portfolio" },
+  { href: "/dashboard/settings", label: "Settings" },
+];
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -13,27 +20,41 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-neutral-200">
+      <header className="border-b border-line bg-sheet">
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
-          <nav aria-label="Dashboard" className="flex items-center gap-4">
-            <Link href="/dashboard" className="font-semibold">
-              {artist.displayName}
-            </Link>
+          <p className="font-display text-lg font-semibold">
+            {artist.displayName}
+          </p>
+          <div className="flex items-center gap-4 text-sm">
             <Link
-              href="/dashboard/settings"
-              className="text-sm text-neutral-600 hover:text-neutral-900"
+              href={`/${artist.handle}`}
+              className="text-muted underline underline-offset-2 hover:text-ink"
             >
-              Settings
+              View public page
             </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="text-muted underline underline-offset-2 hover:text-ink"
+              >
+                Log out
+              </button>
+            </form>
+          </div>
+          <nav
+            aria-label="Dashboard"
+            className="flex w-full flex-wrap gap-x-6 gap-y-1 text-sm"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="py-1 text-muted hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="text-sm text-neutral-600 underline hover:text-neutral-900"
-            >
-              Log out
-            </button>
-          </form>
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
