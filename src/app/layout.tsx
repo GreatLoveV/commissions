@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* first thing a keyboard user reaches: jumps past the navigation */}
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-10 focus:rounded-sm focus:bg-sheet focus:px-4 focus:py-2 focus:font-medium"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-10 focus:rounded-full focus:bg-ink focus:px-5 focus:py-2.5 focus:font-semibold focus:text-canvas"
         >
           Skip to content
         </a>
