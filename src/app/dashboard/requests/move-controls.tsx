@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { FormMessage } from "@/components/form";
-import { buttonDanger, buttonPrimary, buttonSecondary, inputClass } from "@/components/styles";
+import { buttonClass, inputClass } from "@/components/styles";
 import { move } from "./actions";
 
 type Option = { to: string; label: string };
@@ -20,7 +20,7 @@ export function MoveSelect({ requestId, options }: { requestId: string; options:
       </label>
       {/* stacked: board columns are too narrow for them side by side */}
       <div className="flex flex-col gap-2">
-        <select id={selectId} name="to" className={`${inputClass} py-1 text-sm`}>
+        <select id={selectId} name="to" className={`${inputClass} py-1.5 pr-1 pl-2.5 text-sm`}>
           {options.map((option) => (
             <option key={option.to} value={option.to}>
               {option.label}
@@ -30,7 +30,7 @@ export function MoveSelect({ requestId, options }: { requestId: string; options:
         <button
           type="submit"
           disabled={pending}
-          className={`${buttonSecondary} px-3 py-1 text-sm`}
+          className={buttonClass("secondary", "sm")}
         >
           Move
         </button>
@@ -47,10 +47,10 @@ export function MoveButtons({ requestId, options }: { requestId: string; options
 
   return (
     <form action={action} className="flex flex-col gap-3">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-2">
         {options.map((option, index) => {
           const ends = option.to === "CANCELLED" || option.to === "DECLINED";
-          const style = ends ? buttonDanger : index === 0 ? buttonPrimary : buttonSecondary;
+          const style = `${buttonClass(ends ? "danger" : index === 0 ? "primary" : "secondary")} w-full`;
           return (
             <button
               key={option.to}

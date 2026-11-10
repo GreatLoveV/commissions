@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buttonSecondary, linkClass, sheetClass } from "@/components/styles";
+import { StatusBadge } from "@/components/status-badge";
+import { buttonClass, linkClass, sheetClass } from "@/components/styles";
+import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
+import { StageLine } from "@/components/ui/stage-line";
 import { getRequest } from "@/lib/artist-requests";
 import { formatMoney, minorToInput } from "@/lib/money";
 import { requireArtist } from "@/lib/session";
-import { describeEvent, moveLabel, simpleMoves, STATUS_LABELS } from "@/lib/status";
+import { describeEvent, moveLabel, simpleMoves, stageIndex, STAGES } from "@/lib/status";
 import { storage } from "@/lib/storage";
 import { markPayment, removePayment } from "../actions";
 import { MoveButtons } from "../move-controls";
@@ -44,197 +48,214 @@ export default async function RequestPage({
     .filter((payment) => payment.status === "PAID")
     .reduce((sum, payment) => sum + payment.amountMinor, 0);
 
+  const stage = stageIndex(request.status);
+
   return (
-    <div className="flex max-w-3xl flex-col gap-10">
-      <header className="flex flex-col gap-3">
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-col gap-4">
         <p>
           <Link href="/dashboard" className={linkClass}>
             Back to the board
           </Link>
         </p>
-        <h1 className="text-3xl font-semibold text-balance">
-          {request.typeNameSnapshot} for {request.clientName}
-        </h1>
-        <p className="text-lg font-medium">{STATUS_LABELS[request.status]}</p>
+        <div className="flex flex-col items-start gap-3">
+          <StatusBadge status={request.status} />
+          <h1 className="text-4xl sm:text-5xl">
+            {request.typeNameSnapshot} for {request.clientName}
+          </h1>
+        </div>
+        {stage !== null && (
+          <div className={`${sheetClass} px-5 py-5 sm:px-8`}>
+            <StageLine stages={STAGES} current={stage} label="Progress of this request" />
+          </div>
+        )}
       </header>
 
-      {moves.length > 0 && (
-        <section aria-labelledby="next-heading" className="flex flex-col gap-3">
-          <h2 id="next-heading" className="text-xl font-semibold">
-            Next step
-          </h2>
-          {request.status === "AWAITING_PAYMENT" && paidTotal === 0 && (
-            <p className="text-muted">
-              No payment is recorded yet. You can still start, but most
-              artists wait for the deposit.
-            </p>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        {/* the next step comes first on a phone: it is why the artist opened this page */}
+        <aside className="flex flex-col gap-6 lg:sticky lg:top-6 lg:order-2">
+          {moves.length > 0 && (
+            <Panel title="Next step">
+              <div className="flex flex-col gap-3">
+                {request.status === "AWAITING_PAYMENT" && paidTotal === 0 && (
+                  <p className="text-sm text-muted">
+                    No payment is recorded yet. You can still start, but most
+                    artists wait for the deposit.
+                  </p>
+                )}
+                <MoveButtons requestId={request.id} options={moves} />
+              </div>
+            </Panel>
           )}
-          <MoveButtons requestId={request.id} options={moves} />
-        </section>
-      )}
+          <Panel title="Client" tone="sunk">
+            <dl className="flex flex-col gap-3">
+              <div>
+                <dt className="text-sm text-muted">Name</dt>
+                <dd className="font-semibold">{request.clientName}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Email</dt>
+                <dd className="break-all">
+                  <a href={`mailto:${request.clientEmail}`} className={linkClass}>
+                    {request.clientEmail}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Use</dt>
+                <dd className="font-semibold">{request.usage === "COMMERCIAL" ? "Commercial" : "Personal"}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Deadline</dt>
+                <dd className="font-semibold">{request.deadline ? dayFormat.format(request.deadline) : "None given"}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted">Listed price when requested</dt>
+                <dd className="font-semibold tabular-nums">from {money(request.basePriceMinorSnapshot)}</dd>
+              </div>
+            </dl>
+          </Panel>
+        </aside>
 
-      <section aria-labelledby="brief-heading" className={`${sheetClass} flex flex-col gap-4 p-6`}>
-        <h2 id="brief-heading" className="text-xl font-semibold">
-          What the client asked for
-        </h2>
-        <p className="max-w-prose whitespace-pre-line">{request.description}</p>
-        <dl className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-sm text-muted">Client</dt>
-            <dd>
-              {request.clientName},{" "}
-              <a href={`mailto:${request.clientEmail}`} className={linkClass}>
-                {request.clientEmail}
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt className="text-sm text-muted">Use</dt>
-            <dd>{request.usage === "COMMERCIAL" ? "Commercial" : "Personal"}</dd>
-          </div>
-          <div>
-            <dt className="text-sm text-muted">Deadline</dt>
-            <dd>{request.deadline ? dayFormat.format(request.deadline) : "None given"}</dd>
-          </div>
-          <div>
-            <dt className="text-sm text-muted">Listed price when requested</dt>
-            <dd className="tabular-nums">from {money(request.basePriceMinorSnapshot)}</dd>
-          </div>
-        </dl>
+        <div className="flex min-w-0 flex-col gap-6 lg:order-1">
+          <Panel title="What the client asked for">
+            <div className="flex flex-col gap-5">
+              <p className="max-w-prose whitespace-pre-line">{request.description}</p>
+              <div className="flex flex-col gap-3">
+                <h3 className="text-lg">Reference images</h3>
+                {request.files.length === 0 ? (
+                  <p className="text-muted">The client did not add any.</p>
+                ) : (
+                  <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    {request.files.map((file) => (
+                      <li key={file.id}>
+                        {/* opens the full image. noreferrer keeps this page's url
+                            from being sent along */}
+                        <a href={storage.url(file.storageKey)} target="_blank" rel="noreferrer" className="block rounded-control">
+                          <Image
+                            src={storage.url(file.storageKey)}
+                            alt={`Reference image ${file.originalName}, opens full size in a new tab`}
+                            width={240}
+                            height={240}
+                            sizes="(min-width: 640px) 200px, 50vw"
+                            className="aspect-square w-full rounded-control bg-sunk object-cover"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </Panel>
 
-        <h3 className="font-semibold">Reference images</h3>
-        {request.files.length === 0 ? (
-          <p className="text-muted">The client did not add any.</p>
-        ) : (
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {request.files.map((file) => (
-              <li key={file.id}>
-                {/* opens the full image. noreferrer keeps this page's url
-                    from being sent along */}
-                <a href={storage.url(file.storageKey)} target="_blank" rel="noreferrer">
-                  <Image
-                    src={storage.url(file.storageKey)}
-                    alt={`Reference image ${file.originalName}, opens full size in a new tab`}
-                    width={240}
-                    height={240}
-                    sizes="(min-width: 640px) 200px, 50vw"
-                    className="aspect-square w-full rounded-sm border border-line object-cover"
-                  />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section id="quote" aria-labelledby="quote-heading" className="flex scroll-mt-6 flex-col gap-4">
-        <h2 id="quote-heading" className="text-xl font-semibold">
-          Quote
-        </h2>
-        {request.quotedPriceMinor === null ? (
-          <p className="text-muted">
-            You have not sent a price yet. The client sees it on their
-            request page and has to approve it before work starts.
-          </p>
-        ) : (
-          <p className="tabular-nums">
-            <span className="text-2xl font-semibold">{money(request.quotedPriceMinor)}</span>{" "}
-            <span className="text-muted">
-              {request.quoteApprovedAt
-                ? `approved on ${dayFormat.format(request.quoteApprovedAt)}`
-                : "waiting for the client's answer"}
-            </span>
-          </p>
-        )}
-        {canQuote && (
-          <QuoteForm
-            requestId={request.id}
-            currency={request.currency}
-            currentPrice={
-              request.quotedPriceMinor === null
-                ? undefined
-                : minorToInput(request.quotedPriceMinor)
-            }
-          />
-        )}
-      </section>
-
-      <section aria-labelledby="payments-heading" className="flex flex-col gap-4">
-        <h2 id="payments-heading" className="text-xl font-semibold">
-          Payments
-        </h2>
-        <p className="text-muted">
-          Payments happen outside this app. Write down here what the client
-          has paid so you can see what is still owed.
-        </p>
-        {request.quotedPriceMinor !== null && (
-          <p className="tabular-nums">
-            Paid {money(paidTotal)} of {money(request.quotedPriceMinor)}
-          </p>
-        )}
-        {request.payments.length > 0 && (
-          <ul className={`${sheetClass} divide-y divide-line`}>
-            {request.payments.map((payment) => {
-              const paid = payment.status === "PAID";
-              return (
-                <li
-                  key={payment.id}
-                  className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-4"
-                >
-                  <div>
-                    <p className="font-medium tabular-nums">
-                      {payment.kind === "DEPOSIT" ? "Deposit" : "Final payment"},{" "}
-                      {money(payment.amountMinor)}
-                    </p>
-                    <p className="text-sm text-muted">
-                      {paid && payment.paidAt
-                        ? `Paid on ${dayFormat.format(payment.paidAt)}`
-                        : "Not paid yet"}
-                      {payment.note ? `. ${payment.note}` : ""}
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <form action={markPayment.bind(null, request.id, payment.id, !paid)}>
-                      <button type="submit" className={buttonSecondary}>
-                        {paid ? "Mark as unpaid" : "Mark as paid"}
-                      </button>
-                    </form>
-                    <form action={removePayment.bind(null, request.id, payment.id)}>
-                      <button type="submit" className={buttonSecondary}>
-                        Delete
-                      </button>
-                    </form>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {canAddPayment ? (
-          <PaymentForm requestId={request.id} currency={request.currency} />
-        ) : (
-          request.status === "REQUESTED" && (
-            <p className="text-muted">You can record payments once a quote is sent.</p>
-          )
-        )}
-      </section>
-
-      <section aria-labelledby="history-heading" className="flex flex-col gap-4">
-        <h2 id="history-heading" className="text-xl font-semibold">
-          History
-        </h2>
-        <ol className="flex flex-col gap-3 border-l border-line pl-4">
-          {request.events.map((event) => (
-            <li key={event.id}>
-              <p className="font-medium">{describeEvent(event)}</p>
-              <p className="text-sm text-muted">
-                {ACTORS[event.actor]}, {timeFormat.format(event.createdAt)} UTC
+          <section id="quote" aria-labelledby="quote-heading" className={`${sheetClass} flex scroll-mt-6 flex-col gap-4 p-5 sm:p-6`}>
+            <h2 id="quote-heading" className="text-xl">
+              Quote
+            </h2>
+            {request.quotedPriceMinor === null ? (
+              <p className="text-muted">
+                You have not sent a price yet. The client sees it on their
+                request page and has to approve it before work starts.
               </p>
-              {event.note && <p className="mt-1 whitespace-pre-line">{event.note}</p>}
-            </li>
-          ))}
-        </ol>
-      </section>
+            ) : (
+              <p className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
+                <span className="font-display text-3xl font-semibold">{money(request.quotedPriceMinor)}</span>
+                <span className="text-muted">
+                  {request.quoteApprovedAt
+                    ? `approved on ${dayFormat.format(request.quoteApprovedAt)}`
+                    : "waiting for the client's answer"}
+                </span>
+              </p>
+            )}
+            {canQuote && (
+              <QuoteForm
+                requestId={request.id}
+                currency={request.currency}
+                currentPrice={
+                  request.quotedPriceMinor === null
+                    ? undefined
+                    : minorToInput(request.quotedPriceMinor)
+                }
+              />
+            )}
+          </section>
+
+          <Panel
+            title="Payments"
+            description="Payments happen outside this app. Write down what the client has paid so you can see what is still owed."
+          >
+            <div className="flex flex-col gap-5">
+              {request.quotedPriceMinor !== null && (
+                <p className="font-semibold tabular-nums">
+                  Paid {money(paidTotal)} of {money(request.quotedPriceMinor)}
+                </p>
+              )}
+              {request.payments.length > 0 && (
+                <ul className="divide-y divide-line rounded-control border border-line">
+                  {request.payments.map((payment) => {
+                    const paid = payment.status === "PAID";
+                    return (
+                      <li
+                        key={payment.id}
+                        className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 p-4"
+                      >
+                        <div className="flex flex-col items-start gap-1">
+                          <p className="font-semibold tabular-nums">
+                            {payment.kind === "DEPOSIT" ? "Deposit" : "Final payment"},{" "}
+                            {money(payment.amountMinor)}
+                          </p>
+                          <Badge tone={paid ? "open" : "warn"}>
+                            {paid && payment.paidAt ? `Paid on ${dayFormat.format(payment.paidAt)}` : "Not paid yet"}
+                          </Badge>
+                          {payment.note && <p className="text-sm text-muted">{payment.note}</p>}
+                        </div>
+                        <div className="flex gap-2">
+                          <form action={markPayment.bind(null, request.id, payment.id, !paid)}>
+                            <button type="submit" className={buttonClass("secondary", "sm")}>
+                              {paid ? "Mark as unpaid" : "Mark as paid"}
+                            </button>
+                          </form>
+                          <form action={removePayment.bind(null, request.id, payment.id)}>
+                            <button type="submit" className={buttonClass("danger", "sm")}>
+                              Delete
+                            </button>
+                          </form>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              {canAddPayment ? (
+                <PaymentForm requestId={request.id} currency={request.currency} />
+              ) : (
+                request.status === "REQUESTED" && (
+                  <p className="text-muted">You can record payments once a quote is sent.</p>
+                )
+              )}
+            </div>
+          </Panel>
+
+          <Panel title="History">
+            <ol className="flex flex-col gap-5 border-l-[3px] border-dashed border-blueline pl-6">
+              {request.events.map((event) => (
+                <li key={event.id} className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1.5 -left-[2.0625rem] size-3.5 rounded-full border-[3px] border-ink bg-sheet"
+                  />
+                  <p className="font-semibold">{describeEvent(event)}</p>
+                  <p className="text-sm text-muted">
+                    {ACTORS[event.actor]}, {timeFormat.format(event.createdAt)} UTC
+                  </p>
+                  {event.note && <p className="mt-1 whitespace-pre-line">{event.note}</p>}
+                </li>
+              ))}
+            </ol>
+          </Panel>
+        </div>
+      </div>
     </div>
   );
 }

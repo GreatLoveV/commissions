@@ -1,22 +1,15 @@
 "use client";
 
-import { buttonPrimary } from "@/components/styles";
+import { ErrorState } from "@/components/ui/states";
 
+// Keeps the dashboard navigation visible, so the artist can go elsewhere.
 export default function DashboardError({ reset }: { reset: () => void }) {
   return (
-    <div role="alert" className="flex flex-col items-start gap-4">
-      <h1 className="text-2xl font-semibold">This page could not load</h1>
-      <p className="text-muted">
+    <div className="mx-auto max-w-xl">
+      <ErrorState title="This page could not load" onRetry={reset}>
         Nothing was changed. Try again, and if it keeps failing check that the
         database is running.
-      </p>
-      <button
-        type="button"
-        onClick={reset}
-        className={buttonPrimary}
-      >
-        Try again
-      </button>
+      </ErrorState>
     </div>
   );
 }
