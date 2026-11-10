@@ -19,6 +19,17 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        headers: [
+          // browsers must not guess a file type other than the one we send
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // the app can not be shown inside a frame on another site
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      {
         // private request links: keep them out of search engines and out
         // of the Referer header sent to other sites
         source: "/r/:path*",
