@@ -10,7 +10,8 @@ const buttonBase =
   "active:translate-y-px disabled:pointer-events-none disabled:opacity-55";
 
 export const buttonSizes = {
-  sm: "min-h-9 px-4 text-sm",
+  // 36px with a mouse, 44px on a touch screen
+  sm: "min-h-9 px-4 text-sm pointer-coarse:min-h-11",
   md: "min-h-11 px-5",
   lg: "min-h-13 px-7 text-lg",
 } as const;
@@ -42,7 +43,7 @@ export const linkClass =
 
 export const inputClass =
   "w-full rounded-control border-2 border-line-strong bg-sheet px-3.5 py-2.5 text-ink " +
-  "placeholder:text-muted/80 transition-colors duration-150 hover:border-ink " +
+  "placeholder:text-muted transition-colors duration-150 hover:border-ink " +
   "focus-visible:border-accent focus-visible:outline-accent/30 focus-visible:outline-4 focus-visible:outline-offset-0 " +
   "aria-invalid:border-danger disabled:bg-sunk disabled:text-muted";
 

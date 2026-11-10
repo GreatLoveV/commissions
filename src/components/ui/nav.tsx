@@ -30,7 +30,7 @@ export function NavPills({ items, label }: { items: NavItem[]; label: string }) 
               <Link
                 href={item.href}
                 aria-current={current ? "page" : undefined}
-                className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors duration-150 ${
+                className={`inline-flex min-h-10 items-center pointer-coarse:min-h-11 rounded-full px-4 text-sm font-semibold transition-colors duration-150 ${
                   current ? "bg-ink text-canvas" : "text-muted hover:bg-ink/5 hover:text-ink"
                 }`}
               >

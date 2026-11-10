@@ -66,7 +66,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 onClick={() => dismiss(toast.id)}
-                className="-m-1 grid size-8 place-items-center rounded-full text-muted hover:bg-ink/5 hover:text-ink"
+                className="-m-1 grid size-8 place-items-center pointer-coarse:size-11 rounded-full text-muted hover:bg-ink/5 hover:text-ink"
               >
                 <span aria-hidden="true">×</span>
                 <span className="sr-only">Dismiss</span>

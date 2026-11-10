@@ -20,7 +20,7 @@ export function MoveSelect({ requestId, options }: { requestId: string; options:
       </label>
       {/* stacked: board columns are too narrow for them side by side */}
       <div className="flex flex-col gap-2">
-        <select id={selectId} name="to" className={`${inputClass} py-1.5 pr-1 pl-2.5 text-sm`}>
+        <select id={selectId} name="to" className={`${inputClass} py-1.5 pr-1 pl-2.5 text-sm pointer-coarse:min-h-11`}>
           {options.map((option) => (
             <option key={option.to} value={option.to}>
               {option.label}
