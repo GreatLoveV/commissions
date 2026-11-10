@@ -6,6 +6,11 @@ import { sendEmail } from "@/lib/email";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  // Our forms log in and sign up through server actions, which are rate
+  // limited. The same operations are also exposed as plain http endpoints
+  // under /api/auth by default. Nothing uses those, and leaving them open
+  // would let a script skip the rate limit, so they are turned off.
+  disabledPaths: ["/sign-in/email", "/sign-up/email"],
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
