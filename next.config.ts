@@ -16,6 +16,19 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
   },
+  async headers() {
+    return [
+      {
+        // private request links: keep them out of search engines and out
+        // of the Referer header sent to other sites
+        source: "/r/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {
