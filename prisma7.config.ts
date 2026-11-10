@@ -14,6 +14,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env.DATABASE_URL,
+    // Hosted Postgres (Neon) gives two urls. The app uses the pooled one.
+    // Migrations need the direct one, so DIRECT_URL wins when it is set.
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL,
   },
 });
