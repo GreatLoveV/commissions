@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import { Figtree, Fredoka } from "next/font/google";
 import "./globals.css";
 
-const heading = Bricolage_Grotesque({
+// round and friendly, for headings and artist names
+const heading = Fredoka({
   variable: "--font-heading",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
-const body = Instrument_Sans({
+// clear at small sizes, for everything else
+const body = Figtree({
   variable: "--font-body",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 export const metadata: Metadata = {

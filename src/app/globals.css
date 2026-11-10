@@ -1,23 +1,63 @@
 @import "tailwindcss";
 
 /*
-  Design tokens. The artist's work brings the color, so the interface
-  stays quiet: an artboard grey behind white sheets, dark ink for text
-  and one blue for anything you can act on.
+  Design tokens.
+
+  The idea: an artist's sketchbook. Warm paper behind white sheets, soft
+  plum ink for text, and the light blue pencil artists sketch with
+  ("blueline") as the colour of the main buttons. Pink is for stickers and
+  small happy moments only, never for text on paper.
+
+  The older names (canvas, accent, open...) are kept so every page keeps
+  working while the redesign goes page by page.
 */
 @theme inline {
-  --color-canvas: #ecedf1;
-  --color-sheet: #ffffff;
-  --color-ink: #15171c;
-  --color-muted: #5e6370;
-  --color-line: #d5d7de;
-  --color-accent: #2742f5;
-  --color-accent-strong: #1b2fc4;
-  --color-open: #0b7a41;
-  --color-danger: #b3261e;
+  /* surfaces */
+  --color-canvas: #fbf6ef; /* page background, sketchbook paper */
+  --color-sheet: #ffffff; /* panels that sit on the paper */
+  --color-sunk: #f4ede3; /* wells: table headers, code, skeletons */
+
+  /* text */
+  --color-ink: #26212e;
+  --color-muted: #6a6273; /* 5.4:1 on paper, 5.8:1 on white */
+
+  /* lines */
+  --color-line: #e7ded3;
+  --color-line-strong: #8a8193; /* input borders, 3.4:1 on white */
+
+  /* actions */
+  --color-blueline: #8ec1f2; /* primary button fill, ink text on it */
+  --color-blueline-soft: #d9eafb;
+  --color-accent: #2b57c8; /* links and focus ring, 6.4:1 on white */
+  --color-accent-strong: #1f3f96;
+
+  /* stickers and highlights */
+  --color-pink: #ff8db5; /* decoration only */
+  --color-pink-soft: #ffe1ec;
+  --color-pink-strong: #b4235e; /* text-safe pink */
+
+  /* feedback */
+  --color-open: #2c7a4f;
+  --color-open-soft: #dcf2e3;
+  --color-warn: #8a5a00;
+  --color-warn-soft: #fff0c7;
+  --color-danger: #be3a2f;
+  --color-danger-soft: #fde4e1;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-heading), var(--font-body), ui-sans-serif, sans-serif;
+  --font-display: var(--font-heading), var(--font-body), ui-rounded, sans-serif;
+
+  /* radii are tiered: pills for buttons, soft corners for controls,
+     rounder corners for the panels that hold them */
+  --radius-control: 0.75rem;
+  --radius-panel: 1.25rem;
+  --radius-sticker: 0.5rem;
+
+  /* flat by default. One soft lift for things that float above the page */
+  --shadow-float: 0 1px 2px rgb(38 33 46 / 0.06), 0 8px 24px -6px rgb(38 33 46 / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 body {
@@ -27,9 +67,12 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 /* main only gets focus from the skip link, it needs no ring */
@@ -37,8 +80,37 @@ main:focus {
   outline: none;
 }
 
-/* one focus style everywhere, visible on both grey and white */
+/* one focus style everywhere, visible on paper, white and blue */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* the loading shimmer on skeletons */
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* when someone asks for less motion, nothing moves on its own and every
+   transition is instant */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
