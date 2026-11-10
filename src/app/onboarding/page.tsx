@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Logo } from "@/components/logo";
 import { getCurrentArtist, requireUser } from "@/lib/session";
 import { OnboardingForm } from "./onboarding-form";
 
@@ -10,15 +11,22 @@ export default async function OnboardingPage() {
   if (await getCurrentArtist()) redirect("/dashboard");
 
   return (
-    <main id="main" tabIndex={-1} className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-12">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Set up your profile</h1>
-        <p className="text-muted">
-          This is what clients see on your public page. You can change it
-          later.
-        </p>
-      </div>
-      <OnboardingForm defaultName={user.name} />
-    </main>
+    <div className="flex flex-1 flex-col">
+      <header className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
+        <Logo />
+      </header>
+      <main id="main" tabIndex={-1} className="flex flex-1 items-start justify-center px-4 pt-6 pb-16 sm:items-center sm:pt-0">
+        <div className="flex w-full max-w-md flex-col gap-6 rounded-panel border border-line bg-sheet p-6 sm:p-8">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl">Set up your page</h1>
+            <p className="text-muted">
+              This is what clients see on your public page. You can change it
+              later.
+            </p>
+          </div>
+          <OnboardingForm defaultName={user.name} />
+        </div>
+      </main>
+    </div>
   );
 }
