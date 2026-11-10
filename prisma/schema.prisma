@@ -280,3 +280,14 @@ model Payment {
   @@index([artistId, requestId])
   @@map("payments")
 }
+
+// One row per attempt at something we limit (sending a request, logging
+// in). Not a tenant table: it only stores a hashed key and a time.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@map("rate_limit_hits")
+}
