@@ -44,7 +44,7 @@ export default async function PortfolioPage() {
                 <li key={image.id} className="flex flex-col gap-2 rounded-panel border border-line bg-sheet p-2">
                   <Image
                     src={storage.url(image.storageKey)}
-                    alt={image.alt}
+                    alt={image.alt || "Artwork without a description"}
                     width={image.width}
                     height={image.height}
                     sizes="(min-width: 1024px) 240px, (min-width: 640px) 33vw, 50vw"

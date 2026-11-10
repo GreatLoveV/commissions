@@ -124,7 +124,8 @@ export default async function ArtistPage({ params }: Props) {
                 <li key={image.id} className="mb-4 break-inside-avoid">
                   <Image
                     src={storage.url(image.storageKey)}
-                    alt={image.alt}
+                    // an image without a description still gets a name
+                    alt={image.alt || `Artwork by ${artist.displayName}, ${index + 1} of ${artist.portfolioImages.length}`}
                     width={image.width}
                     height={image.height}
                     sizes="(min-width: 1280px) 260px, (min-width: 1024px) 320px, (min-width: 640px) 33vw, 50vw"
