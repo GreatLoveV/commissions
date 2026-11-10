@@ -15,6 +15,8 @@ export default defineConfig({
     environment: "node",
     env: {
       DATABASE_URL: TEST_DATABASE_URL,
+      BETTER_AUTH_SECRET: "test-secret-only-used-by-the-test-suite",
+      BETTER_AUTH_URL: "http://localhost:3000",
       // uploaded test files go to .uploads/test, removed after the run
       LOCAL_UPLOADS_SUBFOLDER: "test",
     },
