@@ -18,8 +18,9 @@ export function MoveSelect({ requestId, options }: { requestId: string; options:
       <label htmlFor={selectId} className="sr-only">
         Move this request to
       </label>
-      <div className="flex gap-2">
-        <select id={selectId} name="to" className={`${inputClass} min-w-0 py-1 text-sm`}>
+      {/* stacked: board columns are too narrow for them side by side */}
+      <div className="flex flex-col gap-2">
+        <select id={selectId} name="to" className={`${inputClass} py-1 text-sm`}>
           {options.map((option) => (
             <option key={option.to} value={option.to}>
               {option.label}

@@ -110,8 +110,9 @@ export default async function DashboardPage() {
         )}
 
         {/* Stacked on a phone. From large screens up the columns sit side
-            by side and the row scrolls sideways. tabIndex lets keyboard
-            users scroll it. */}
+            by side and share the width. If the window is too narrow for
+            six columns the row scrolls sideways, and tabIndex lets
+            keyboard users scroll it. */}
         <div
           role="region"
           aria-label="Request board"
@@ -124,7 +125,7 @@ export default async function DashboardPage() {
               <section
                 key={status}
                 aria-labelledby={`column-${status}`}
-                className="flex flex-col gap-3 lg:w-60 lg:shrink-0"
+                className="flex flex-col gap-3 lg:min-w-48 lg:flex-1"
               >
                 <h2
                   id={`column-${status}`}

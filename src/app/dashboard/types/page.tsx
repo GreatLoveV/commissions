@@ -15,7 +15,7 @@ export default async function TypesPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex max-w-3xl flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Commission types</h1>
         <Link href="/dashboard/types/new" className={buttonPrimary}>

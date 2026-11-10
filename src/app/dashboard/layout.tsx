@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b border-line bg-sheet">
-        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
           <p className="font-display text-lg font-semibold">
             {artist.displayName}
           </p>
@@ -57,7 +57,7 @@ export default async function DashboardLayout({
           </nav>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         {children}
       </main>
     </div>

@@ -45,7 +45,7 @@ export default async function RequestPage({
     .reduce((sum, payment) => sum + payment.amountMinor, 0);
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex max-w-3xl flex-col gap-10">
       <header className="flex flex-col gap-3">
         <p>
           <Link href="/dashboard" className={linkClass}>
