@@ -41,8 +41,8 @@ export const linkClass =
   "font-medium text-accent underline decoration-accent/40 decoration-2 underline-offset-3 hover:decoration-accent";
 
 export const inputClass =
-  "w-full rounded-control border-2 border-line-strong/50 bg-sheet px-3.5 py-2.5 text-ink " +
-  "placeholder:text-muted/80 transition-colors duration-150 hover:border-line-strong " +
+  "w-full rounded-control border-2 border-line-strong bg-sheet px-3.5 py-2.5 text-ink " +
+  "placeholder:text-muted/80 transition-colors duration-150 hover:border-ink " +
   "focus-visible:border-accent focus-visible:outline-accent/30 focus-visible:outline-4 focus-visible:outline-offset-0 " +
   "aria-invalid:border-danger disabled:bg-sunk disabled:text-muted";
 

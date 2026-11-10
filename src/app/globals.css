@@ -37,11 +37,11 @@
   --color-pink-strong: #b4235e; /* text-safe pink */
 
   /* feedback */
-  --color-open: #2c7a4f;
+  --color-open: #256b43;
   --color-open-soft: #dcf2e3;
   --color-warn: #8a5a00;
   --color-warn-soft: #fff0c7;
-  --color-danger: #be3a2f;
+  --color-danger: #b0352b;
   --color-danger-soft: #fde4e1;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
