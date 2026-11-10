@@ -33,19 +33,21 @@ export function TypeForm({ action, currency, submitLabel, initial }: Props) {
         errors={state.errors?.description}
       />
       <div className="grid gap-5 sm:grid-cols-2">
-      <Field
-        label={`Base price (${currency})`}
-        name="basePrice"
-        hint="Shown as a starting price. You set the final price per request."
-        defaultValue={values.basePrice}
-        errors={state.errors?.basePrice}
-      />
-      <Field
-        label="Turnaround in days"
-        name="turnaroundDays"
-        defaultValue={values.turnaroundDays}
-        errors={state.errors?.turnaroundDays}
-      />
+        <Field
+          label={`Base price (${currency})`}
+          name="basePrice"
+          inputMode="decimal"
+          hint="Shown as a starting price. You set the final price per request."
+          defaultValue={values.basePrice}
+          errors={state.errors?.basePrice}
+        />
+        <Field
+          label="Turnaround in days"
+          name="turnaroundDays"
+          inputMode="numeric"
+          defaultValue={values.turnaroundDays}
+          errors={state.errors?.turnaroundDays}
+        />
       </div>
       <FormMessage message={state.message} />
       <div>

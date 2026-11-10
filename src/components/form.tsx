@@ -10,6 +10,8 @@ type FieldProps = {
   type?: string;
   defaultValue?: string;
   autoComplete?: string;
+  // brings up the number keyboard on phones for prices and days
+  inputMode?: "decimal" | "numeric";
   hint?: string;
   errors?: string[];
 };
@@ -50,6 +52,7 @@ export function Field({
   type = "text",
   defaultValue,
   autoComplete,
+  inputMode,
   hint,
   errors,
 }: FieldProps) {
@@ -64,6 +67,7 @@ export function Field({
         type={type}
         defaultValue={defaultValue}
         autoComplete={autoComplete}
+        inputMode={inputMode}
         aria-invalid={errors?.length ? true : undefined}
         aria-describedby={describedBy(name, hint, errors)}
         className={inputClass}

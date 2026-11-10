@@ -21,6 +21,7 @@ export function QuoteForm({ requestId, currency, currentPrice }: QuoteProps) {
       <Field
         label={`Final price (${currency})`}
         name="price"
+        inputMode="decimal"
         defaultValue={values.price}
         errors={state.errors?.price}
       />
@@ -69,6 +70,7 @@ export function PaymentForm({ requestId, currency }: { requestId: string; curren
       <Field
         label={`Amount (${currency})`}
         name="amount"
+        inputMode="decimal"
         defaultValue={values.amount}
         errors={state.errors?.amount}
       />
