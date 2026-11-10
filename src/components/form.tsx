@@ -2,6 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { buttonPrimary, inputClass } from "@/components/styles";
+import { Spinner } from "@/components/ui/states";
 
 type FieldProps = {
   label: string;
@@ -92,14 +93,45 @@ export function TextArea({ label, name, defaultValue, hint, errors }: FieldProps
   );
 }
 
+type SelectProps = Omit<FieldProps, "type" | "autoComplete"> & {
+  options: { value: string; label: string }[];
+};
+
+export function Select({ label, name, defaultValue, hint, errors, options }: SelectProps) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor={name} className="text-sm font-medium">
+        {label}
+      </label>
+      <select
+        id={name}
+        name={name}
+        defaultValue={defaultValue}
+        aria-invalid={errors?.length ? true : undefined}
+        aria-describedby={describedBy(name, hint, errors)}
+        className={inputClass}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <FieldMessages name={name} hint={hint} errors={errors} />
+    </div>
+  );
+}
+
 export function SubmitButton({ children }: { children: React.ReactNode }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
       disabled={pending}
+      aria-busy={pending || undefined}
       className={buttonPrimary}
     >
+      {pending && <Spinner size="sm" />}
       {children}
     </button>
   );
