@@ -15,8 +15,7 @@ export default function setup(project: TestProject) {
 
   // runs after all tests: remove the files they uploaded
   return () => {
-    const uploads = project.config.env.LOCAL_UPLOADS_DIR;
-    if (uploads) rmSync(String(uploads), { recursive: true, force: true });
+    rmSync(".uploads/test", { recursive: true, force: true });
   };
 }
 

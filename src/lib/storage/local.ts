@@ -6,8 +6,8 @@ import type { ImageStorage } from "./index";
 // Development storage: files go in the .uploads folder (ignored by git)
 // and are served by src/app/uploads/[...path]/route.ts.
 
-// tests point this at a temp folder
-const ROOT = process.env.LOCAL_UPLOADS_DIR ?? path.join(process.cwd(), ".uploads");
+// Tests set this so their files land in .uploads/test and can be wiped.
+const SUBFOLDER = process.env.LOCAL_UPLOADS_SUBFOLDER === "test" ? "test" : "";
 
 // A key looks like "portfolio/<artist id>/<uuid>.png". Checking every key
 // against this pattern is what stops "../" tricks from reaching other files.
@@ -17,7 +17,9 @@ function filePath(key: string) {
   if (!KEY_PATTERN.test(key)) {
     throw new Error("Invalid storage key");
   }
-  return path.join(ROOT, key);
+  // The path always starts with the fixed ".uploads" folder. That keeps
+  // the build from packaging the whole project "just in case".
+  return path.join(process.cwd(), ".uploads", SUBFOLDER, key);
 }
 
 export const localStorage: ImageStorage = {

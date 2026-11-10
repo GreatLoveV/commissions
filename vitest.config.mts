@@ -1,5 +1,3 @@
-import { tmpdir } from "node:os";
-import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
@@ -17,8 +15,8 @@ export default defineConfig({
     environment: "node",
     env: {
       DATABASE_URL: TEST_DATABASE_URL,
-      // uploaded test files go to a temp folder, not the project
-      LOCAL_UPLOADS_DIR: path.join(tmpdir(), "commissions-test-uploads"),
+      // uploaded test files go to .uploads/test, removed after the run
+      LOCAL_UPLOADS_SUBFOLDER: "test",
     },
     globalSetup: "./tests/global-setup.ts",
     // the test files share one database, so they run one after another
