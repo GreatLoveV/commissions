@@ -5,7 +5,10 @@ import { APIError } from "better-auth/api";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { text, type FormState } from "@/lib/form";
+import { clientIp, limits, rateLimitAll } from "@/lib/rate-limit";
 import { loginSchema, signupSchema } from "@/lib/validation/auth";
+
+const TOO_MANY = "Too many attempts. Wait a few minutes and try again.";
 
 export async function signup(
   _prev: FormState,
@@ -22,6 +25,10 @@ export async function signup(
   });
   if (!parsed.success) {
     return { errors: z.flattenError(parsed.error).fieldErrors, values };
+  }
+
+  if (!(await rateLimitAll(limits.signup(await clientIp())))) {
+    return { message: TOO_MANY, values };
   }
 
   try {
@@ -52,6 +59,13 @@ export async function login(
   });
   if (!parsed.success) {
     return { errors: z.flattenError(parsed.error).fieldErrors, values };
+  }
+
+  // Limited per address and per email, so one address cannot try many
+  // accounts and many addresses cannot hammer one account.
+  const rules = limits.login(await clientIp(), parsed.data.email);
+  if (!(await rateLimitAll(rules))) {
+    return { message: TOO_MANY, values };
   }
 
   try {
