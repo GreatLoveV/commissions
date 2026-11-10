@@ -72,3 +72,24 @@ export function moveLabel(from: RequestStatus, to: RequestStatus) {
 export function isRequestStatus(value: string): value is RequestStatus {
   return value in STATUS_LABELS;
 }
+
+// One line of a request's history, in words.
+export function describeEvent(event: {
+  type: string;
+  toStatus: RequestStatus | null;
+}) {
+  switch (event.type) {
+    case "CREATED":
+      return "Request received";
+    case "QUOTE_SENT":
+      return "Quote sent";
+    case "QUOTE_APPROVED":
+      return "Quote approved";
+    case "PAYMENT_RECORDED":
+      return "Payment recorded";
+    case "STATUS_CHANGED":
+      return event.toStatus ? `Moved to ${STATUS_LABELS[event.toStatus]}` : "Status changed";
+    default:
+      return "Note";
+  }
+}
