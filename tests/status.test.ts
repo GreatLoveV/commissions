@@ -7,6 +7,8 @@ import {
   CLOSED_STATUSES,
   moveLabel,
   simpleMoves,
+  stageIndex,
+  STAGES,
   STATUS_LABELS,
 } from "@/lib/status";
 
@@ -74,5 +76,21 @@ describe("artist moves", () => {
         expect(moveLabel(from, to).length).toBeGreaterThan(3);
       }
     }
+  });
+});
+
+describe("stageIndex", () => {
+  it("puts board statuses on the line in order", () => {
+    expect(stageIndex("REQUESTED")).toBe(0);
+    expect(stageIndex("SKETCH_REVIEW")).toBe(4);
+  });
+
+  it("marks every stage done once delivered", () => {
+    expect(stageIndex("DELIVERED")).toBe(STAGES.length);
+  });
+
+  it("leaves declined and cancelled requests off the line", () => {
+    expect(stageIndex("DECLINED")).toBeNull();
+    expect(stageIndex("CANCELLED")).toBeNull();
   });
 });

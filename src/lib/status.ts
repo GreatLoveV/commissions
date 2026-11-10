@@ -93,3 +93,29 @@ export function describeEvent(event: {
       return "Note";
   }
 }
+
+// The stage line on the request pages: the board columns, with
+// "Awaiting payment" shortened so it fits under a dot.
+export const STAGES = BOARD_STATUSES.map((status) => ({
+  label: status === "AWAITING_PAYMENT" ? "Payment" : STATUS_LABELS[status],
+}));
+
+// Where a request is on that line. A delivered request has every stage
+// done. Declined and cancelled requests are not on the line at all (null).
+export function stageIndex(status: RequestStatus) {
+  if (status === "DELIVERED") return BOARD_STATUSES.length;
+  const index = BOARD_STATUSES.indexOf(status);
+  return index === -1 ? null : index;
+}
+
+// Badge colour for each status
+export const STATUS_TONES = {
+  REQUESTED: "pink",
+  QUOTED: "blue",
+  AWAITING_PAYMENT: "warn",
+  IN_PROGRESS: "blue",
+  SKETCH_REVIEW: "pink",
+  DELIVERED: "open",
+  DECLINED: "neutral",
+  CANCELLED: "neutral",
+} as const satisfies Record<RequestStatus, string>;
