@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { text, type FormState } from "@/lib/form";
+import { notifyArtist, notifyClient } from "@/lib/notifications";
 import { clientIp, limits, rateLimitAll } from "@/lib/rate-limit";
 import { createClientRequest } from "@/lib/requests";
 import { requestSchema } from "@/lib/validation/request";
@@ -53,6 +54,11 @@ export async function sendRequest(
       values,
     };
   }
+
+  // The client gets their private link by email, and the artist hears
+  // about the new request.
+  await notifyClient(result.id);
+  await notifyArtist(result.id, "new_request");
 
   revalidatePath("/dashboard");
   redirect(`/r/${result.token}/references`);

@@ -10,6 +10,7 @@ import {
   setPaymentPaid,
 } from "@/lib/artist-requests";
 import { text, type FormState } from "@/lib/form";
+import { notifyClient } from "@/lib/notifications";
 import { requireArtist } from "@/lib/session";
 import { isRequestStatus } from "@/lib/status";
 import { paymentSchema, quoteSchema } from "@/lib/validation/dashboard-request";
@@ -39,6 +40,9 @@ export async function move(
   const result = await moveRequest(artist.id, requestId, to);
   if (!result.ok) return { message: result.error };
 
+  // every status change is emailed to the client
+  await notifyClient(requestId);
+
   refresh(requestId);
   return { ok: true };
 }
@@ -58,6 +62,8 @@ export async function quote(
 
   const result = await sendQuote(artist.id, requestId, parsed.data);
   if (!result.ok) return { message: result.error, values };
+
+  await notifyClient(requestId);
 
   refresh(requestId);
   return { ok: true, message: "Quote sent." };
