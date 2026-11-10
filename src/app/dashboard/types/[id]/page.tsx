@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { linkClass } from "@/components/styles";
+import { Panel } from "@/components/ui/panel";
 import { minorToInput } from "@/lib/money";
 import { requireArtist } from "@/lib/session";
 import { tenantDb } from "@/lib/tenant";
@@ -23,9 +26,14 @@ export default async function EditTypePage({
   if (!type) notFound();
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold">Edit {type.name}</h1>
+    <div className="flex max-w-2xl flex-col gap-6">
+      <p>
+        <Link href="/dashboard/types" className={linkClass}>
+          Back to commission types
+        </Link>
+      </p>
+      <h1 className="text-4xl">Edit {type.name}</h1>
+      <Panel>
         <TypeForm
           action={updateType.bind(null, type.id)}
           currency={artist.currency}
@@ -37,11 +45,10 @@ export default async function EditTypePage({
             turnaroundDays: String(type.turnaroundDays),
           }}
         />
-      </div>
-      <section className="flex max-w-md flex-col gap-3 border-t border-line pt-6">
-        <h2 className="text-lg font-semibold">Delete</h2>
-        <DeleteType id={type.id} />
-      </section>
+      </Panel>
+      <Panel title="Delete this type" tone="sunk">
+        <DeleteType id={type.id} name={type.name} />
+      </Panel>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function TypeForm({ action, currency, submitLabel, initial }: Props) {
   const values = state.values ?? initial ?? {};
 
   return (
-    <form action={formAction} className="flex max-w-md flex-col gap-4" noValidate>
+    <form action={formAction} className="flex flex-col gap-5" noValidate>
       <Field
         label="Name"
         name="name"
@@ -32,6 +32,7 @@ export function TypeForm({ action, currency, submitLabel, initial }: Props) {
         defaultValue={values.description}
         errors={state.errors?.description}
       />
+      <div className="grid gap-5 sm:grid-cols-2">
       <Field
         label={`Base price (${currency})`}
         name="basePrice"
@@ -45,6 +46,7 @@ export function TypeForm({ action, currency, submitLabel, initial }: Props) {
         defaultValue={values.turnaroundDays}
         errors={state.errors?.turnaroundDays}
       />
+      </div>
       <FormMessage message={state.message} />
       <div>
         <SubmitButton>{submitLabel}</SubmitButton>

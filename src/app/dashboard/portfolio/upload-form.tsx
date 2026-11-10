@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form";
+import { fileInputClass } from "@/components/styles";
 import { uploadPortfolioImage } from "./actions";
 
 export function UploadForm() {
@@ -9,7 +10,7 @@ export function UploadForm() {
   const imageErrors = state.errors?.image;
 
   return (
-    <form action={action} className="flex max-w-md flex-col gap-4" noValidate>
+    <form action={action} className="flex flex-col gap-5" noValidate>
       <div className="flex flex-col gap-1">
         <label htmlFor="image" className="text-sm font-medium">
           Image
@@ -22,7 +23,7 @@ export function UploadForm() {
           accept="image/jpeg,image/png,image/webp"
           aria-invalid={imageErrors?.length ? true : undefined}
           aria-describedby="image-hint image-error"
-          className="text-sm file:mr-3 file:rounded-sm file:border file:border-line file:bg-sheet file:px-3 file:py-2 file:font-medium"
+          className={fileInputClass}
         />
         <p id="image-hint" className="text-sm text-muted">
           JPEG, PNG or WebP, up to 4 MB.

@@ -21,7 +21,7 @@ export function SettingsForm({ profile }: Props) {
   const values = state.values ?? profile;
 
   return (
-    <form action={action} className="flex max-w-md flex-col gap-4" noValidate>
+    <form action={action} className="flex flex-col gap-5" noValidate>
       <Field
         label="Display name"
         name="displayName"
@@ -70,7 +70,9 @@ export function SettingsForm({ profile }: Props) {
         ) : null}
       </div>
       <FormMessage ok={state.ok} message={state.message} />
-      <SubmitButton>Save profile</SubmitButton>
+      <div>
+        <SubmitButton>Save profile</SubmitButton>
+      </div>
     </form>
   );
 }
