@@ -6,7 +6,9 @@ import type { RequestStatus } from "@/generated/prisma/enums";
 import { linkClass, sheetClass } from "@/components/styles";
 import { formatMoney } from "@/lib/money";
 import { getRequestByToken } from "@/lib/requests";
-import { describeEvent } from "@/lib/status";
+import { StatusBadge } from "@/components/status-badge";
+import { StageLine } from "@/components/ui/stage-line";
+import { describeEvent, stageIndex, STAGES } from "@/lib/status";
 import { storage } from "@/lib/storage";
 import { AnswerForm } from "./answer-form";
 
@@ -63,10 +65,12 @@ export default async function RequestStatusPage({
   // the message the artist wrote with their latest quote
   const quoteNote = request.events.findLast((event) => event.type === "QUOTE_SENT")?.note;
 
+  const stage = stageIndex(request.status);
+
   return (
     <>
       <header className="flex flex-col gap-3">
-        <h1 className="text-3xl font-semibold text-balance">
+        <h1 className="text-4xl sm:text-5xl">
           Your {request.typeNameSnapshot} request to{" "}
           {request.artist.displayName}
         </h1>
@@ -76,26 +80,31 @@ export default async function RequestStatusPage({
         </p>
       </header>
 
-      <section aria-labelledby="status-heading" className={`${sheetClass} flex flex-col gap-4 p-6`}>
-        <div>
-          <h2 id="status-heading" className="text-xl font-semibold">
+      <section aria-labelledby="status-heading" className={`${sheetClass} flex flex-col gap-6 p-6 sm:p-8`}>
+        <div className="flex flex-col items-start gap-2">
+          <StatusBadge status={request.status} />
+          <h2 id="status-heading" className="text-2xl">
             {status.title}
           </h2>
           <p className="text-muted">{status.detail}</p>
         </div>
 
+        {stage !== null && (
+          <StageLine stages={STAGES} current={stage} label="Progress of your request" />
+        )}
+
         {request.quotedPriceMinor !== null && (
-          <div className="flex flex-col gap-3 border-t border-line pt-4">
-            <p className="tabular-nums">
-              <span className="text-sm text-muted">Price </span>
-              <span className="text-2xl font-semibold">{money(request.quotedPriceMinor)}</span>
-              {paid > 0 && <span className="text-muted">, {money(paid)} paid so far</span>}
+          <div className="flex flex-col gap-4 rounded-control bg-sunk p-5">
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">
+              <span className="text-sm text-muted">Price</span>
+              <span className="font-display text-3xl font-semibold">{money(request.quotedPriceMinor)}</span>
+              {paid > 0 && <span className="text-muted">{money(paid)} paid so far</span>}
             </p>
             {quoteNote && (
-              <p className="whitespace-pre-line">
-                <span className="text-sm text-muted">From the artist: </span>
-                {quoteNote}
-              </p>
+              <blockquote className="border-l-4 border-blueline pl-4 whitespace-pre-line">
+                <p className="text-sm text-muted">From {request.artist.displayName}</p>
+                <p>{quoteNote}</p>
+              </blockquote>
             )}
             {request.status === "QUOTED" && (
               <AnswerForm token={token} priceMinor={request.quotedPriceMinor} />
@@ -105,38 +114,42 @@ export default async function RequestStatusPage({
       </section>
 
       <section aria-labelledby="timeline-heading" className="flex flex-col gap-4">
-        <h2 id="timeline-heading" className="text-xl font-semibold">
+        <h2 id="timeline-heading" className="text-2xl">
           What has happened so far
         </h2>
-        <ol className="flex flex-col gap-3 border-l border-line pl-4">
+        <ol className="flex flex-col gap-5 border-l-[3px] border-dashed border-blueline pl-6">
           {request.events.map((event) => (
-            <li key={event.id}>
-              <p className="font-medium">{describeEvent(event)}</p>
+            <li key={event.id} className="relative">
+              <span
+                aria-hidden="true"
+                className="absolute top-1.5 -left-[2.0625rem] size-3.5 rounded-full border-[3px] border-ink bg-sheet"
+              />
+              <p className="font-semibold">{describeEvent(event)}</p>
               <p className="text-sm text-muted">{dayFormat.format(event.createdAt)}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      <section aria-labelledby="brief-heading" className="flex flex-col gap-4">
-        <h2 id="brief-heading" className="text-xl font-semibold">
+      <section aria-labelledby="brief-heading" className={`${sheetClass} flex flex-col gap-5 p-6 sm:p-8`}>
+        <h2 id="brief-heading" className="text-2xl">
           What you asked for
         </h2>
         <p className="whitespace-pre-line">{request.description}</p>
-        <dl className="flex flex-col gap-3">
+        <dl className="grid gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-sm text-muted">Use</dt>
-            <dd>{request.usage === "COMMERCIAL" ? "Commercial" : "Personal"}</dd>
+            <dd className="font-semibold">{request.usage === "COMMERCIAL" ? "Commercial" : "Personal"}</dd>
           </div>
           {request.deadline && (
             <div>
               <dt className="text-sm text-muted">Deadline</dt>
-              <dd>{dayFormat.format(request.deadline)}</dd>
+              <dd className="font-semibold">{dayFormat.format(request.deadline)}</dd>
             </div>
           )}
         </dl>
         {request.files.length > 0 && (
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {request.files.map((file) => (
               <li key={file.id}>
                 <Image
@@ -144,8 +157,8 @@ export default async function RequestStatusPage({
                   alt={`Reference image ${file.originalName}`}
                   width={240}
                   height={240}
-                  sizes="(min-width: 640px) 180px, 50vw"
-                  className="aspect-square w-full rounded-sm border border-line bg-sheet object-cover"
+                  sizes="(min-width: 640px) 200px, 50vw"
+                  className="aspect-square w-full rounded-control bg-sunk object-cover"
                 />
               </li>
             ))}

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buttonPrimary, buttonSecondary, sheetClass } from "@/components/styles";
+import { buttonClass, sheetClass } from "@/components/styles";
+import { Sticker } from "@/components/ui/badge";
 import { getRequestByToken, MAX_REFERENCE_FILES } from "@/lib/requests";
 import { storage } from "@/lib/storage";
 import { removeReference } from "./actions";
@@ -22,13 +23,14 @@ export default async function ReferencesPage({
 
   return (
     <>
-      <header className="flex flex-col gap-3">
-        <h1 className="text-3xl font-semibold text-balance">
-          Your request was sent to {request.artist.displayName}
+      <header className="flex flex-col items-start gap-3">
+        <Sticker tone="open">Request sent</Sticker>
+        <h1 className="text-4xl sm:text-5xl">
+          Show {request.artist.displayName} what you have in mind
         </h1>
         <p className="text-muted">
-          You can add up to {MAX_REFERENCE_FILES} reference images so the
-          artist sees what you have in mind. This step is optional.
+          Add up to {MAX_REFERENCE_FILES} reference images: your character,
+          a pose, colours you like. This step is optional.
         </p>
       </header>
 
@@ -43,11 +45,11 @@ export default async function ReferencesPage({
                 width={240}
                 height={240}
                 sizes="(min-width: 640px) 180px, 50vw"
-                className="aspect-square w-full rounded-sm border border-line bg-sheet object-cover"
+                className="aspect-square w-full rounded-control bg-sunk object-cover"
               />
               {canChange && (
                 <form action={removeReference.bind(null, token, file.id)}>
-                  <button type="submit" className={buttonSecondary}>
+                  <button type="submit" className={buttonClass("secondary", "sm")}>
                     Remove
                   </button>
                 </form>
@@ -58,25 +60,25 @@ export default async function ReferencesPage({
       )}
 
       {canChange && hasRoom && (
-        <div className={`${sheetClass} p-6`}>
+        <div className={`${sheetClass} p-6 sm:p-8`}>
           <ReferenceForm token={token} />
         </div>
       )}
       {canChange && !hasRoom && (
-        <p className="text-muted">
+        <p className="rounded-control bg-sunk p-4">
           You have added the maximum of {MAX_REFERENCE_FILES} images. Remove
           one to add a different one.
         </p>
       )}
       {!canChange && (
-        <p className="text-muted">
+        <p className="rounded-control bg-sunk p-4">
           The artist has already replied to this request, so its reference
           images can no longer be changed.
         </p>
       )}
 
       <p>
-        <Link href={`/r/${token}`} className={buttonPrimary}>
+        <Link href={`/r/${token}`} className={buttonClass(request.files.length > 0 ? "primary" : "secondary")}>
           {request.files.length > 0 ? "Done" : "Skip this step"}
         </Link>
       </p>

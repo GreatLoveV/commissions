@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { FormMessage, SubmitButton } from "@/components/form";
+import { fileInputClass } from "@/components/styles";
 import { uploadReference } from "./actions";
 
 export function ReferenceForm({ token }: { token: string }) {
@@ -22,7 +23,7 @@ export function ReferenceForm({ token }: { token: string }) {
           accept="image/jpeg,image/png,image/webp"
           aria-invalid={errors?.length ? true : undefined}
           aria-describedby="image-hint image-error"
-          className="text-sm file:mr-3 file:rounded-sm file:border file:border-line file:bg-sheet file:px-3 file:py-2 file:font-medium"
+          className={fileInputClass}
         />
         <p id="image-hint" className="text-sm text-muted">
           One image at a time. JPEG, PNG or WebP, up to 4 MB.
