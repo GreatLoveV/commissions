@@ -129,15 +129,15 @@ export default async function DashboardPage() {
             declined or cancelled are listed below.
           </p>
         ) : (
-          // Stacked on a phone, two columns on a tablet. From large screens
-          // up the columns sit side by side and share the width. If the
-          // window is too narrow for six columns the row scrolls sideways,
-          // and tabIndex lets keyboard users scroll it.
+          // Stacked on a phone, two columns on a tablet, three on a laptop.
+          // Only on a wide window do all six sit side by side. If they ever
+          // do not fit the row scrolls sideways, and tabIndex lets keyboard
+          // users scroll it.
           <div
             role="region"
             aria-label="Request board"
             tabIndex={0}
-            className="grid gap-6 rounded-panel md:grid-cols-2 lg:flex lg:gap-4 lg:overflow-x-auto lg:pb-4"
+            className="grid gap-6 rounded-panel md:grid-cols-2 lg:grid-cols-3 min-[88rem]:flex min-[88rem]:gap-4 min-[88rem]:overflow-x-auto min-[88rem]:pb-4"
           >
             {BOARD_STATUSES.map((status) => {
               const inColumn = requests.filter((r) => r.status === status);
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
                 <section
                   key={status}
                   aria-labelledby={`column-${status}`}
-                  className="flex flex-col gap-3 lg:min-w-48 lg:flex-1 lg:basis-0"
+                  className="flex flex-col gap-3 min-[88rem]:min-w-48 min-[88rem]:flex-1 min-[88rem]:basis-0"
                 >
                   <h3
                     id={`column-${status}`}
