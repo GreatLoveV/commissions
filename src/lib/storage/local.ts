@@ -6,7 +6,8 @@ import type { ImageStorage } from "./index";
 // Development storage: files go in the .uploads folder (ignored by git)
 // and are served by src/app/uploads/[...path]/route.ts.
 
-const ROOT = path.join(process.cwd(), ".uploads");
+// tests point this at a temp folder
+const ROOT = process.env.LOCAL_UPLOADS_DIR ?? path.join(process.cwd(), ".uploads");
 
 // A key looks like "portfolio/<artist id>/<uuid>.png". Checking every key
 // against this pattern is what stops "../" tricks from reaching other files.
