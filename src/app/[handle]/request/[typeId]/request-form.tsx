@@ -60,21 +60,26 @@ export function RequestForm({ action }: Props) {
         aria-describedby={usageErrors?.length ? "usage-error" : undefined}
       >
         <legend className="text-sm font-medium">How will the artwork be used?</legend>
-        {usageOptions.map((option) => (
-          <label key={option.value} className="flex items-start gap-3">
-            <input
-              type="radio"
-              name="usage"
-              value={option.value}
-              defaultChecked={values.usage === option.value}
-              className="mt-1.5 accent-accent"
-            />
-            <span>
-              <span className="font-medium">{option.label}</span>
-              <span className="block text-sm text-muted">{option.hint}</span>
-            </span>
-          </label>
-        ))}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {usageOptions.map((option) => (
+            <label
+              key={option.value}
+              className="flex cursor-pointer items-start gap-3 rounded-control border-2 border-line-strong bg-sheet p-4 transition-colors duration-150 hover:border-ink has-checked:border-ink has-checked:bg-blueline-soft has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent"
+            >
+              <input
+                type="radio"
+                name="usage"
+                value={option.value}
+                defaultChecked={values.usage === option.value}
+                className="mt-1 size-4 accent-ink focus-visible:outline-none"
+              />
+              <span>
+                <span className="font-semibold">{option.label}</span>
+                <span className="block text-sm text-muted">{option.hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
         {usageErrors?.length ? (
           <p id="usage-error" className="text-sm text-danger">
             {usageErrors.join(". ")}
