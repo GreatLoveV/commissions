@@ -74,6 +74,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      <h1 className="sr-only">Dashboard</h1>
       <section
         aria-labelledby="slots-heading"
         className={`${sheetClass} flex flex-wrap items-center justify-between gap-4 p-4`}
@@ -101,7 +102,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Requests</h1>
+        <h2 className="text-2xl font-semibold">Requests</h2>
         {requests.length === 0 && (
           <p className="text-muted">
             No requests yet. They show up here when a client sends one from
@@ -127,7 +128,7 @@ export default async function DashboardPage() {
                 aria-labelledby={`column-${status}`}
                 className="flex flex-col gap-3 lg:min-w-48 lg:flex-1"
               >
-                <h2
+                <h3
                   id={`column-${status}`}
                   className="flex items-baseline justify-between border-b border-line pb-2 font-display font-semibold"
                 >
@@ -135,7 +136,7 @@ export default async function DashboardPage() {
                   <span className="text-sm font-normal text-muted tabular-nums">
                     {inColumn.length}
                   </span>
-                </h2>
+                </h3>
                 {inColumn.length === 0 ? (
                   <p className="text-sm text-muted">Nothing here.</p>
                 ) : (

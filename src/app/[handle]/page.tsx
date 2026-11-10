@@ -37,7 +37,7 @@ export default async function ArtistPage({ params }: Props) {
   const hasImages = artist.portfolioImages.length > 0;
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 lg:py-16">
+    <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 lg:py-16">
       <header className="flex max-w-3xl flex-col gap-4">
         <h1 className="font-display text-5xl leading-none font-semibold text-balance break-words sm:text-6xl lg:text-7xl">
           {artist.displayName}

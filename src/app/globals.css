@@ -32,6 +32,11 @@ h2 {
   letter-spacing: -0.02em;
 }
 
+/* main only gets focus from the skip link, it needs no ring */
+main:focus {
+  outline: none;
+}
+
 /* one focus style everywhere, visible on both grey and white */
 :focus-visible {
   outline: 2px solid var(--color-accent);

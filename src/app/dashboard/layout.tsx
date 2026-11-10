@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { requireArtist } from "@/lib/session";
 import { logout } from "./actions";
-
-const navLinks = [
-  { href: "/dashboard", label: "Requests" },
-  { href: "/dashboard/types", label: "Commission types" },
-  { href: "/dashboard/portfolio", label: "Portfolio" },
-  { href: "/dashboard/settings", label: "Settings" },
-];
+import { NavLinks } from "./nav-links";
 
 export default async function DashboardLayout({
   children,
@@ -41,23 +35,10 @@ export default async function DashboardLayout({
               </button>
             </form>
           </div>
-          <nav
-            aria-label="Dashboard"
-            className="flex w-full flex-wrap gap-x-6 gap-y-1 text-sm"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="py-1 text-muted hover:text-ink"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          <NavLinks />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         {children}
       </main>
     </div>

@@ -32,7 +32,7 @@ export default async function RequestPage({ params }: Props) {
   const { artist, type } = found;
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-8 px-4 py-10">
+    <main id="main" tabIndex={-1} className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-8 px-4 py-10">
       <p>
         <Link href={`/${artist.handle}`} className={linkClass}>
           Back to {artist.displayName}
