@@ -31,6 +31,15 @@ Most artists I know take commissions through Discord or Instagram DMs and keep t
 - Cloudinary for images, Resend for email
 - Vitest for tests
 
+## Design
+
+The look is meant to feel like an artist's sketchbook: warm paper background, blue pencil guide lines, little tilted stickers and hand-drawn doodles. It should be friendly without looking like a toy, since artists use it to run a small business.
+
+- **Fonts**: Fredoka for headings, Figtree for text, both loaded with `next/font`
+- **Colours**: all defined once as tokens in `src/app/globals.css`. Every text colour passes WCAG AA (4.5:1) on the background it sits on
+- **Components**: shared pieces live in `src/components/ui` (buttons, panels, badges, the stage line, empty, loading and error states, modal, toasts). In development, `/dev/components` shows all of them on one page. It returns a 404 in production
+- **Motion** is small and only used where it means something: the progress line inks in the step that was just finished, the current step pops in, and buttons give a quick press. With "reduce motion" turned on in the system settings, all of it is switched off
+
 ## Running it locally
 
 You need Node 24 and Docker.
@@ -50,7 +59,7 @@ npm run db:migrate        # create the tables
 npm run dev               # http://localhost:3000
 ```
 
-Without Cloudinary keys, uploaded images are saved to a local `.uploads` folder. Without a Resend key, emails are printed in the terminal instead of being sent, which is handy because you can click the links in them.
+Without Cloudinary keys, uploaded images are saved to a local `.uploads` folder (development only, see below). Without a Resend key, emails are printed in the terminal instead of being sent, which is handy because you can click the links in them.
 
 ## Tests
 
@@ -85,6 +94,26 @@ This was the part I cared most about getting right. Every artist is a tenant and
 - **Money** is stored in minor units (cents) as integers, never as floats.
 - **Rate limiting** is done in Postgres (`src/lib/rate-limit.ts`) so it works on serverless hosting.
 
+## Environment variables
+
+All of them are listed in `.env.example`. Never commit `.env`.
+
+| Variable | Needed | What it is |
+|---|---|---|
+| `DATABASE_URL` | always | Postgres connection string. On Neon, the pooled one |
+| `DIRECT_URL` | hosted database | The direct (not pooled) connection string, used only for migrations. Leave empty locally |
+| `BETTER_AUTH_SECRET` | always | At least 32 random characters. Signs session cookies and builds the private client links, so changing it logs everyone out and breaks every existing link |
+| `BETTER_AUTH_URL` | always | The site's public address, for example `https://commissions.example.com`. Used for links in emails and in page metadata |
+| `CLOUDINARY_CLOUD_NAME` | production | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | production | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | production | Cloudinary API secret |
+| `RESEND_API_KEY` | to send email | Resend API key. Without it emails are not sent (printed in the terminal in development) |
+| `EMAIL_FROM` | to send email | Sender address on a domain verified in Resend, for example `Commissions <hello@yourdomain.com>` |
+
+In production the three Cloudinary variables are required. Without them any page that shows or uploads an image stops with "Image storage is not configured", on purpose: a serverless host throws away files saved to disk, so the local folder would silently lose every upload.
+
+`LOCAL_UPLOADS_SUBFOLDER` is set by the test setup only. You never need to set it yourself.
+
 ## Deploying (free tiers)
 
 The project is set up for Vercel, Neon, Cloudinary and Resend.
@@ -92,11 +121,26 @@ The project is set up for Vercel, Neon, Cloudinary and Resend.
 1. **Neon**: create a project. Copy the pooled connection string to `DATABASE_URL` and the direct one to `DIRECT_URL`.
 2. **Cloudinary**: copy the cloud name, API key and API secret.
 3. **Resend**: create an API key. To send to real clients you have to verify a domain you own, then set `EMAIL_FROM` to an address on it. Without a domain Resend only delivers to your own address.
-4. **Vercel**: import the repo and add every variable from `.env.example`. Set `BETTER_AUTH_URL` to the site's real address and use a new `BETTER_AUTH_SECRET`, not the local one.
+4. **Vercel**: import the repo and add every variable from the table above. Set `BETTER_AUTH_URL` to the site's real address and use a new `BETTER_AUTH_SECRET`, not the local one.
 
 Vercel runs the `vercel-build` script, which applies the migrations and then builds.
 
 Vercel's free plan is for non-commercial projects, so this setup is fine for a portfolio piece but not for charging artists.
+
+### Checklist before going live
+
+- [ ] `npm run lint`, `npm run typecheck` and `npm test` pass
+- [ ] `npm run build` works locally
+- [ ] Every variable in the table is set in Vercel for Production
+- [ ] `BETTER_AUTH_SECRET` is new, long and random, and saved somewhere safe. Losing it breaks every client link
+- [ ] `BETTER_AUTH_URL` is the real `https://` address, with no slash at the end
+- [ ] `DIRECT_URL` is set, so `prisma migrate deploy` can run during the build
+- [ ] The Resend domain is verified and `EMAIL_FROM` uses it
+- [ ] After the first deploy: sign up, pick a handle, add a commission type and upload a portfolio image (this checks Cloudinary)
+- [ ] Open your public page in a private window and send yourself a request. Check that the email arrives and its link opens the request
+- [ ] Send a quote, approve it from the client link and move the request along the board
+- [ ] `/dev/components` returns a 404
+- [ ] `/r/...` links answer with an `X-Robots-Tag: noindex` header, so search engines skip them
 
 ## Not built yet
 
