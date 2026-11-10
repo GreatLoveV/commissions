@@ -16,8 +16,13 @@ export function NavPills({ items, label }: { items: NavItem[]; label: string }) 
   const pathname = usePathname();
 
   return (
-    <nav aria-label={label} className="-mx-1 overflow-x-auto">
-      <ul className="flex w-max gap-1 px-1 py-1">
+    // on a narrow screen the row scrolls sideways; the fade on the right
+    // edge shows there is more
+    <nav
+      aria-label={label}
+      className="-mx-1 overflow-x-auto [mask-image:linear-gradient(to_right,black_85%,transparent)] sm:[mask-image:none]"
+    >
+      <ul className="flex w-max gap-1 py-1 pr-8 pl-1 sm:pr-1">
         {items.map((item) => {
           const current = item.match ? item.match(pathname) : pathname === item.href;
           return (

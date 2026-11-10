@@ -45,8 +45,10 @@ export function BrokenPencil({ className = "" }: DoodleProps) {
   );
 }
 
-// hand drawn underline for one heading on a page, drawn in blue pencil
-export function Scribble({ className = "" }: DoodleProps) {
+// Hand drawn underline for one heading on a page, in blue pencil. With
+// `draw`, the pencil stroke draws itself once when the page opens: the
+// home page's one moment of motion.
+export function Scribble({ className = "", draw = false }: DoodleProps & { draw?: boolean }) {
   return (
     <svg viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true" className={className} fill="none">
       <path
@@ -54,6 +56,9 @@ export function Scribble({ className = "" }: DoodleProps) {
         stroke="var(--color-blueline)"
         strokeWidth="5"
         strokeLinecap="round"
+        pathLength={1}
+        strokeDasharray="1"
+        className={draw ? "animate-[draw-line_520ms_var(--ease-out-soft)_200ms_both]" : undefined}
       />
     </svg>
   );

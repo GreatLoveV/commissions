@@ -48,3 +48,10 @@ export const inputClass =
 
 // white panel that sits on the paper background
 export const sheetClass = "rounded-panel border border-line bg-sheet";
+
+// file pickers: the browser's button gets the secondary button look, and
+// the whole picker sits in a dashed "drop your sketch here" box
+export const fileInputClass =
+  "w-full cursor-pointer rounded-control border-2 border-dashed border-blueline bg-sheet p-3 text-sm text-muted " +
+  "file:mr-3 file:cursor-pointer file:rounded-full file:border-2 file:border-ink/15 file:bg-sheet file:px-4 file:py-2 " +
+  "file:font-semibold file:text-ink hover:file:border-ink aria-invalid:border-danger";
