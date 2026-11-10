@@ -2,16 +2,53 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { RequestStatus } from "@/generated/prisma/enums";
 import { linkClass, sheetClass } from "@/components/styles";
+import { formatMoney } from "@/lib/money";
 import { getRequestByToken } from "@/lib/requests";
+import { describeEvent } from "@/lib/status";
 import { storage } from "@/lib/storage";
+import { AnswerForm } from "./answer-form";
 
 export const metadata: Metadata = { title: "Your request" };
 
-const dateFormat = new Intl.DateTimeFormat("en", {
-  dateStyle: "long",
-  timeZone: "UTC",
-});
+const dayFormat = new Intl.DateTimeFormat("en", { dateStyle: "long", timeZone: "UTC" });
+
+// What each status means for the client, in their words.
+const STATUS_TEXT: Record<RequestStatus, { title: string; detail: string }> = {
+  REQUESTED: {
+    title: "Waiting for the artist to reply",
+    detail: "The artist will read your request and send you a price.",
+  },
+  QUOTED: {
+    title: "The artist sent you a price",
+    detail: "Work starts only after you approve it.",
+  },
+  AWAITING_PAYMENT: {
+    title: "Quote approved, payment is next",
+    detail: "The artist will contact you about how to pay.",
+  },
+  IN_PROGRESS: {
+    title: "The artist is working on it",
+    detail: "You will get an email when there is something to look at.",
+  },
+  SKETCH_REVIEW: {
+    title: "A sketch is ready for your feedback",
+    detail: "The artist sends the sketch to you directly. Reply to them with your changes.",
+  },
+  DELIVERED: {
+    title: "Delivered",
+    detail: "The artist has marked this commission as delivered.",
+  },
+  DECLINED: {
+    title: "The artist declined this request",
+    detail: "No payment is due.",
+  },
+  CANCELLED: {
+    title: "This request was cancelled",
+    detail: "Nothing more will happen with it.",
+  },
+};
 
 export default async function RequestStatusPage({
   params,
@@ -19,6 +56,12 @@ export default async function RequestStatusPage({
   const { token } = await params;
   const request = await getRequestByToken(token);
   if (!request) notFound();
+
+  const status = STATUS_TEXT[request.status];
+  const money = (minor: number) => formatMoney(minor, request.currency);
+  const paid = request.payments.reduce((sum, payment) => sum + payment.amountMinor, 0);
+  // the message the artist wrote with their latest quote
+  const quoteNote = request.events.findLast((event) => event.type === "QUOTE_SENT")?.note;
 
   return (
     <>
@@ -28,22 +71,59 @@ export default async function RequestStatusPage({
           {request.artist.displayName}
         </h1>
         <p className="text-muted">
-          Save the link to this page. It is your private way back to this
-          request, so only share it with people who should see it.
+          This link is your private page for this request. Only share it with
+          people who should see it.
         </p>
       </header>
 
-      <section className={`${sheetClass} flex flex-col gap-4 p-6`}>
-        <h2 className="text-xl font-semibold">
-          {request.status === "REQUESTED"
-            ? "Waiting for the artist to reply"
-            : "The artist has replied"}
-        </h2>
-        <dl className="flex flex-col gap-3">
-          <div>
-            <dt className="text-sm text-muted">Sent on</dt>
-            <dd>{dateFormat.format(request.createdAt)}</dd>
+      <section aria-labelledby="status-heading" className={`${sheetClass} flex flex-col gap-4 p-6`}>
+        <div>
+          <h2 id="status-heading" className="text-xl font-semibold">
+            {status.title}
+          </h2>
+          <p className="text-muted">{status.detail}</p>
+        </div>
+
+        {request.quotedPriceMinor !== null && (
+          <div className="flex flex-col gap-3 border-t border-line pt-4">
+            <p className="tabular-nums">
+              <span className="text-sm text-muted">Price </span>
+              <span className="text-2xl font-semibold">{money(request.quotedPriceMinor)}</span>
+              {paid > 0 && <span className="text-muted">, {money(paid)} paid so far</span>}
+            </p>
+            {quoteNote && (
+              <p className="whitespace-pre-line">
+                <span className="text-sm text-muted">From the artist: </span>
+                {quoteNote}
+              </p>
+            )}
+            {request.status === "QUOTED" && (
+              <AnswerForm token={token} priceMinor={request.quotedPriceMinor} />
+            )}
           </div>
+        )}
+      </section>
+
+      <section aria-labelledby="timeline-heading" className="flex flex-col gap-4">
+        <h2 id="timeline-heading" className="text-xl font-semibold">
+          What has happened so far
+        </h2>
+        <ol className="flex flex-col gap-3 border-l border-line pl-4">
+          {request.events.map((event) => (
+            <li key={event.id}>
+              <p className="font-medium">{describeEvent(event)}</p>
+              <p className="text-sm text-muted">{dayFormat.format(event.createdAt)}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="brief-heading" className="flex flex-col gap-4">
+        <h2 id="brief-heading" className="text-xl font-semibold">
+          What you asked for
+        </h2>
+        <p className="whitespace-pre-line">{request.description}</p>
+        <dl className="flex flex-col gap-3">
           <div>
             <dt className="text-sm text-muted">Use</dt>
             <dd>{request.usage === "COMMERCIAL" ? "Commercial" : "Personal"}</dd>
@@ -51,21 +131,11 @@ export default async function RequestStatusPage({
           {request.deadline && (
             <div>
               <dt className="text-sm text-muted">Deadline</dt>
-              <dd>{dateFormat.format(request.deadline)}</dd>
+              <dd>{dayFormat.format(request.deadline)}</dd>
             </div>
           )}
-          <div>
-            <dt className="text-sm text-muted">What you asked for</dt>
-            <dd className="whitespace-pre-line">{request.description}</dd>
-          </div>
         </dl>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">Reference images</h2>
-        {request.files.length === 0 ? (
-          <p className="text-muted">You did not add any reference images.</p>
-        ) : (
+        {request.files.length > 0 && (
           <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {request.files.map((file) => (
               <li key={file.id}>
