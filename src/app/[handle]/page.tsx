@@ -100,6 +100,16 @@ export default async function ArtistPage({ params }: Props) {
                     Ready in about {type.turnaroundDays}{" "}
                     {type.turnaroundDays === 1 ? "day" : "days"}
                   </p>
+                  {artist.slotsOpen && (
+                    <p className="mt-1">
+                      <Link
+                        href={`/${artist.handle}/request/${type.id}`}
+                        className="font-medium text-accent underline underline-offset-2 hover:text-accent-strong"
+                      >
+                        Request a {type.name}
+                      </Link>
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>
