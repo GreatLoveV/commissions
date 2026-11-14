@@ -12,7 +12,9 @@ import { formatMoney, minorToInput } from "@/lib/money";
 import { requireArtist } from "@/lib/session";
 import { describeEvent, moveLabel, simpleMoves, stageIndex, STAGES } from "@/lib/status";
 import { storage } from "@/lib/storage";
+import { trackingUrl } from "@/lib/tokens";
 import { markPayment, removePayment } from "../actions";
+import { CopyLink } from "../copy-link";
 import { MoveButtons } from "../move-controls";
 import { PaymentForm, QuoteForm } from "../request-forms";
 
@@ -114,6 +116,12 @@ export default async function RequestPage({
                 <dd className="font-semibold tabular-nums">from {money(request.basePriceMinorSnapshot)}</dd>
               </div>
             </dl>
+          </Panel>
+          <Panel
+            title="Client's private link"
+            description="Where the client follows this request and answers your quote. Send it to them if they lost it. Anyone with the link can see the request."
+          >
+            <CopyLink url={trackingUrl(request.id)} />
           </Panel>
         </aside>
 
