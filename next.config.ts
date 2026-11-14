@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
   },
+  async redirects() {
+    return [
+      // some browsers ask for /favicon.ico without reading the page.
+      // Without this it would land on the /[handle] page.
+      { source: "/favicon.ico", destination: "/icon.svg", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
